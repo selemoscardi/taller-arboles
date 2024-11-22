@@ -1,0 +1,122 @@
+program untitled;
+const
+  DF=300;
+type
+  oficina=record
+    id:integer;
+    dni:integer;
+    valor:real;
+  end;
+  
+  vector=array [1..DF] of oficina;
+  
+  procedure cargarVector(VAR v:vector; VAR dl:integer);
+    procedure leerOficina(VAR o:oficina);
+    begin
+       {o.id:=random(30);
+       if(o.id<>0)then begin
+         o.dni:=(1+random(50))*8;
+         o.valor:=1000+random(8000-1000+1);
+       end;}
+       writeln('ingrese id');
+       readln(o.id);
+       if(o.id<>0)then begin
+       writeln('ingrese dni');
+       readln(o.dni);
+       writeln('ingrese valor de expensas');
+       readln(o.valor)
+       end;
+    end;
+    
+    procedure imprimirDesordenado(v:vector; dl:integer);
+    var i:integer;
+    begin
+      for i:= 1 to dl do 
+        writeln('pos ', i, ' id ', v[i].id);
+    end;
+    
+    procedure ordenarInsercion(var v:vector;DL:integer);
+    var  
+      i,j:integer;
+      act:integer;
+    begin
+      for i:= 2 to DL do begin
+        act:= v[i].id;
+        j:= i-1;
+        while ( (j>0) and (v[j].id>act) ) do begin
+          v[j+1].id:= v[j].id;
+          j:=j-1;
+        end;
+        v[j+1].id:=act;
+      end;
+    end;
+    
+  var 
+   o:oficina;
+  begin
+    DL:=1;
+    leerOficina(o);
+    while(o.id<>0)do begin
+      v[DL]:=o;
+      DL:=DL+1;
+      leerOficina(o);
+      end;
+    imprimirDesordenado(v,dl);
+    writeln('ahora ORDENELO!');
+    ordenarInsercion(v,dl);
+	imprimirDesordenado(v,dl);
+  end;
+
+ procedure incisoC (v:vector; DL:integer);
+   function busquedaDicotomica(v:vector; ini:integer; fin:integer; dni:integer):integer;
+   var  pos:integer; mid:integer;
+   begin
+     mid:= (ini+fin) DIV 2;
+     while ( (ini<=fin) and (dni<>v[mid].dni) ) do begin
+       if(dni<v[mid].dni) then 
+         fin:=mid-1
+       else 
+          ini:=mid+1;
+        mid:=(ini+fin)  DIV 2;  
+     end;
+     if  ( (ini<=fin) and (dni=v[mid].dni) ) then begin
+       pos:=mid;
+       end
+     else 
+       pos:=0;
+     busquedaDicotomica:= pos;
+   end;
+ var
+   ingresado: integer;
+   ini,oficina:integer;
+ begin 
+   ini:=1;
+   writeln('ingrese un dni ');
+   readln(ingresado);
+   if ((busquedaDicotomica(v,ini,DL,ingresado)=0) )then 
+     writeln('NO EXISTE ESE DNI PELOTUDA')
+   else begin
+     oficina:= busquedaDicotomica(v,ini,DL,ingresado);
+     writeln('se encontro en la oficina: ', oficina, 'y el dni es: ', v[oficina].dni);
+ end;
+ end;
+ 
+  procedure montoTotal(v:vector;dl:integer);
+      function calcularMonto(i:integer):real;
+      begin
+        if(i>dl) then calcularMonto:=0
+        else calcularMonto:= v[i].valor+ calcularMonto(i+1);
+      end;
+  begin
+    writeln('monto total: ', calcularMonto(1));
+  end;
+ 
+var 
+  v:vector;
+  DL:integer;
+BEGIN
+	randomize;
+	cargarVector(v,DL);
+	incisoC (v, DL);
+	montoTotal(v,DL);
+END.
